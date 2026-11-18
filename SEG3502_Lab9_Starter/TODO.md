@@ -1,5 +1,8 @@
 # TODO
 
+Add the second user: user2 with pass2
+
+
 - Start the app:
   ```powershell
   .\gradlew.bat bootRun
