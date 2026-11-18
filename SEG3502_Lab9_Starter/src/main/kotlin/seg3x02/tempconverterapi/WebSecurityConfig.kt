@@ -1,11 +1,9 @@
-package seg3x02.converter
+package seg3x02.tempconverterapi
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -16,30 +14,30 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig {
-    
+
     @Bean
     @Throws(Exception::class)
-       fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .authorizeHttpRequests { auth -> auth.anyRequest().authenticated() }
-            .formLogin {formLogin -> formLogin.loginPage("/login").permitAll() }
-            .logout(Customizer.withDefaults())
+            .httpBasic { } //https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html
+            .csrf { csrf -> csrf.disable() } //p.12
         return http.build()
     }
+
     @Bean
     fun userDetailsService(): UserDetailsService {
-        val user: UserDetails = User.withUsername("appuser")
-            .password(passwordEncoder().encode("userpassword"))
-            .roles("USER")
+        val user1: UserDetails = User.withUsername("user1")
+            .password(passwordEncoder().encode("pass1"))
             .build()
-        return InMemoryUserDetailsManager(user)
+
+        val user2: UserDetails = User.withUsername("user2")
+            .password(passwordEncoder().encode("pass2"))
+            .build()
+
+        return InMemoryUserDetailsManager(user1, user2)
     }
-    @Bean
-    fun webSecurityCustomizer(): WebSecurityCustomizer {
-        return WebSecurityCustomizer { web: WebSecurity ->
-            web.ignoring()
-                .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**","/vendor/**","/fonts/**") }
-    }
+
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
