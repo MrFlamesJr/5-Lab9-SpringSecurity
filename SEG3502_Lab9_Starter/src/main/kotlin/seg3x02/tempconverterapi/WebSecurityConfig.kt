@@ -30,10 +30,12 @@ class WebSecurityConfig {
         val user1: UserDetails = User.withUsername("user1")
             .password(passwordEncoder().encode("pass1"))
             .build()
-        
-        //TODO add user2 here with pass2
 
-        return InMemoryUserDetailsManager(user1)
+        val user2: UserDetails = User.withUsername("user2")
+            .password(passwordEncoder().encode("pass2"))
+            .build()
+
+        return InMemoryUserDetailsManager(user1, user2)
     }
 
     @Bean
